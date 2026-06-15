@@ -1,4 +1,4 @@
-const CACHE = "gymapp-v2.0.0";
+const CACHE = "gymapp-v3.0.0";
 
 const PRECACHE = [
   "./",
@@ -7,7 +7,9 @@ const PRECACHE = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
-  "./icons/favicon.svg"
+  "./icons/apple-touch-icon-light.png",
+  "./icons/favicon-dark.png",
+  "./icons/favicon-light.png"
 ];
 
 self.addEventListener("install", (event) => {
