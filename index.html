@@ -64,7 +64,21 @@
     .page { display: none; flex-direction: column; flex: 1; overflow: hidden; padding-bottom: calc(var(--tab-h) + var(--safe-bottom)); }
     .page.active { display: flex; }
     .page-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 16px 90px; }
-    .page-header { padding: 60px 20px 16px; font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
+    .page-header { padding: 60px 20px 16px; font-size: 34px; font-weight: 800; letter-spacing: -.8px; }
+
+    /* Treino header is a row: big title + round add button */
+    .page-header.header-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .page-header.header-row .header-title { flex: 1; min-width: 0; }
+    .header-add-btn {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent-btn); color: var(--accent-btn-text);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--glow); transition: opacity .15s;
+    }
+    .header-add-btn:active { opacity: .7; }
+    .header-add-btn svg { width: 22px; height: 22px; }
 
     /* ── BUTTONS ── */
     .btn {
@@ -87,15 +101,15 @@
     .btn-trash svg { width: 16px; height: 16px; }
     .btn-trash:disabled { opacity: .2; pointer-events: none; }
 
-    .btn-lock {
+    /* ── THREE-DOTS MENU BUTTON ── */
+    .btn-dots {
       background: none; border: none; color: var(--muted2); cursor: pointer;
-      padding: 5px; border-radius: 6px; display: flex;
+      padding: 6px; border-radius: 8px; display: flex;
       align-items: center; justify-content: center;
       transition: color .15s, background .15s; flex-shrink: 0;
     }
-    .btn-lock.locked { color: var(--highlight); }
-    .btn-lock:active { opacity: .6; }
-    .btn-lock svg { width: 16px; height: 16px; }
+    .btn-dots:active, .btn-dots:hover { color: var(--accent); background: var(--surface2); }
+    .btn-dots svg { width: 18px; height: 18px; }
 
     /* ── CHECK CIRCLE ── */
     .check-btn {
@@ -114,8 +128,6 @@
       border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
       box-shadow: var(--glow); transition: background .3s, border-color .3s;
     }
-    .card.locked-card { border-color: var(--highlight); }
-
     .card-header {
       display: flex; align-items: center; justify-content: space-between;
       gap: 8px; padding: 14px 16px; cursor: pointer;
@@ -126,7 +138,6 @@
       flex: 1; min-width: 0; font-family: inherit;
     }
     .card-title:focus { border-bottom: 1px solid var(--muted); }
-    .card-title[readonly] { opacity: .7; cursor: default; }
 
     .card-actions { display: flex; gap: 2px; align-items: center; }
     .card-body { padding: 0 16px 14px; }
@@ -136,6 +147,24 @@
 
     .card-foot { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; }
 
+    /* ── WORKOUT LIST ROW (compact, tappable) ── */
+    .wk-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px; cursor: pointer;
+    }
+    .wk-row-main { flex: 1; min-width: 0; }
+    .wk-row-name {
+      font-size: 17px; font-weight: 600; color: var(--accent);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .wk-row-sub { font-size: 12px; color: var(--muted2); margin-top: 3px; }
+    .wk-row-right { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+    .wk-row-progress {
+      font-size: 13px; font-weight: 600; color: var(--muted2);
+      font-variant-numeric: tabular-nums; white-space: nowrap; margin-right: 4px;
+    }
+    .wk-chevron { color: var(--muted); font-size: 22px; line-height: 1; margin-left: 2px; }
+
     /* ── PROGRESS BAR ── */
     .progress-track { height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--highlight); border-radius: 2px; width: 0; transition: width .25s; }
@@ -143,32 +172,71 @@
     .wk-progress { font-size: 12px; color: var(--muted2); font-variant-numeric: tabular-nums; margin-right: 4px; white-space: nowrap; }
     .last-completed { font-size: 11px; color: var(--muted2); margin-bottom: 8px; }
 
-    /* ── EXERCISE ITEM (two-line layout) ── */
-    .ex-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .ex-item:last-of-type { border-bottom: none; }
-    .ex-line1 { display: flex; align-items: flex-start; gap: 8px; }
-    .ex-line1 .check-btn { margin-top: 5px; }
-    .ex-line1 .btn-trash { margin-top: 5px; }
-    .ex-item.done .ex-name { opacity: .45; }
-
-    .ex-line2 { display: flex; align-items: flex-end; gap: 8px; padding: 8px 0 0 34px; }
-    .ex-field { display: flex; flex-direction: column; gap: 3px; width: 62px; }
-    .ex-field label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-    .ex-field input { text-align: center; padding: 6px 4px; }
-
-    .ex-reorder { margin-left: auto; display: flex; gap: 4px; }
-    .btn-arrow {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
-      color: var(--muted2); cursor: pointer; width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center; padding: 0;
-      transition: color .15s, border-color .15s; flex-shrink: 0;
+    /* ── FULL-SCREEN WORKOUT DETAIL ── */
+    #workout-detail {
+      position: fixed; inset: 0; z-index: 150;
+      background: var(--bg); display: none; flex-direction: column;
+      max-width: 480px; margin: 0 auto;
+      transform: translateY(100%); transition: transform .25s ease;
     }
-    .btn-arrow:active { color: var(--accent); border-color: var(--muted2); }
-    .btn-arrow:disabled { opacity: .25; pointer-events: none; }
-    .btn-arrow svg { width: 12px; height: 12px; }
+    #workout-detail.open { display: flex; transform: translateY(0); }
+    .detail-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(env(safe-area-inset-top, 0px) + 16px) 12px 8px;
+      flex-shrink: 0;
+    }
+    .detail-icon-btn {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      background: none; border: none; color: var(--accent); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .detail-icon-btn:active, .detail-icon-btn:hover { background: var(--surface2); }
+    .detail-icon-btn svg { width: 24px; height: 24px; }
+    .detail-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 16px calc(var(--safe-bottom) + 120px); }
+    .detail-title { font-size: 30px; font-weight: 800; letter-spacing: -.6px; word-break: break-word; }
+    .detail-sub { font-size: 13px; color: var(--muted2); margin-top: 6px; }
+    .detail-last { font-size: 12px; color: var(--muted2); margin-top: 2px; }
+    .detail-track { margin: 14px 0 4px; }
+    .detail-ex-list { margin-top: 18px; }
 
-    .locked-note { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; margin-top: 8px; }
-    .locked-note svg { width: 12px; height: 12px; flex-shrink: 0; }
+    /* ── EXERCISE ROW (detail screen) ── */
+    .ex-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .ex-item:last-of-type { border-bottom: none; }
+    .ex-line1 { display: flex; align-items: flex-start; gap: 10px; }
+    .ex-line1 .check-btn { margin-top: 1px; }
+    .ex-name {
+      flex: 1; min-width: 0; font-size: 16px; font-weight: 600; line-height: 1.35;
+      color: var(--accent); cursor: pointer; word-break: break-word;
+      background: none; border: none; text-align: left; font-family: inherit; padding: 2px 0;
+    }
+    .ex-name:active { opacity: .6; }
+    .ex-item.done .ex-name { opacity: .45; }
+    .ex-line1 .btn-dots { margin-top: -2px; }
+
+    /* ── PILL FIELDS + QUICK +1 ── */
+    .ex-pills { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0 0 36px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 12px; transition: border-color .15s;
+    }
+    .pill:focus-within { border-color: var(--muted2); }
+    .pill input {
+      background: none; border: none; outline: none; color: var(--accent);
+      font-size: 15px; font-weight: 600; font-family: inherit; width: 42px; text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .pill input::placeholder { color: var(--muted); }
+    .pill .pill-unit { font-size: 12px; color: var(--muted2); font-weight: 600; }
+    .btn-plus1 {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 999px;
+      color: var(--accent); cursor: pointer; height: 34px; padding: 0 12px;
+      display: inline-flex; align-items: center; gap: 3px; font-size: 14px; font-weight: 700;
+      font-family: inherit; transition: border-color .15s, color .15s; flex-shrink: 0;
+    }
+    .btn-plus1:active { border-color: var(--highlight); color: var(--highlight); }
+    .btn-plus1 svg { width: 12px; height: 12px; }
 
     /* ── INPUTS ── */
     .ex-input {
@@ -180,17 +248,6 @@
     }
     .ex-input:focus { border-color: var(--muted2); }
     .ex-input::placeholder { color: var(--muted); }
-    .ex-input[readonly] { opacity: .6; cursor: default; }
-
-    /* exercise name: auto-resize textarea */
-    textarea.ex-name {
-      resize: none; line-height: 1.45;
-      min-height: 36px;
-      overflow: hidden;
-      height: auto;
-      flex: 1; min-width: 0;
-    }
-    textarea.ex-name::-webkit-scrollbar { display: none; }
 
     /* number inputs */
     input.ex-num { text-align: center; }
@@ -228,6 +285,33 @@
       margin-bottom: 14px; text-align: center;
     }
 
+    /* ── ACTION MENU SHEET (contextual ⋯) ── */
+    .menu-list { display: flex; flex-direction: column; gap: 4px; }
+    .menu-action {
+      display: flex; align-items: center; gap: 14px; width: 100%;
+      background: none; border: none; color: var(--accent);
+      font-size: 15px; font-weight: 600; font-family: inherit;
+      padding: 14px 8px; border-radius: 10px; cursor: pointer; text-align: left;
+      transition: background .15s, opacity .15s;
+    }
+    .menu-action:active { background: var(--surface2); }
+    .menu-action svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--muted2); }
+    .menu-action.danger { color: var(--danger); }
+    .menu-action.danger svg { color: var(--danger); }
+    .menu-action:disabled { opacity: .3; pointer-events: none; }
+
+    /* ── RENAME SHEET ── */
+    .rename-input {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--accent); font-size: 16px;
+      padding: 12px 14px; outline: none; width: 100%; font-family: inherit;
+      margin-bottom: 14px; transition: border-color .15s;
+    }
+    .rename-input:focus { border-color: var(--muted2); }
+    .rename-input::placeholder { color: var(--muted); }
+    .rename-actions { display: flex; gap: 10px; }
+    .rename-actions .btn { flex: 1; }
+
     /* ── REST TIMER ── */
     #timer-fab {
       position: fixed;
@@ -235,10 +319,13 @@
       bottom: calc(var(--tab-h) + var(--safe-bottom) + 16px);
       width: 56px; height: 56px; border-radius: 50%;
       background: var(--accent-btn); color: var(--accent-btn-text);
-      border: none; cursor: pointer; z-index: 90;
+      border: none; cursor: pointer; z-index: 160;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 16px rgba(0,0,0,.45);
     }
+    /* When the full-screen detail is open it covers the tab bar,
+       so the FAB sits closer to the bottom edge. */
+    body.detail-open #timer-fab { bottom: calc(var(--safe-bottom) + 24px); }
     #timer-fab:active { opacity: .8; }
     #timer-fab svg { width: 26px; height: 26px; }
     .fab-badge {
@@ -385,15 +472,14 @@
 
   <!-- WORKOUT PAGE -->
   <div id="page-workout" class="page active">
-    <div class="page-header">Treinos</div>
+    <div class="page-header header-row">
+      <span class="header-title">Treinos</span>
+      <button class="header-add-btn" onclick="addWorkout()" aria-label="Novo treino">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
     <div class="page-scroll">
       <div id="workout-list"></div>
-      <div class="add-section">
-        <button class="btn btn-primary" onclick="addWorkout()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Novo treino
-        </button>
-      </div>
     </div>
   </div>
 
@@ -482,10 +568,45 @@
       <div class="settings-section">
         <div class="settings-label">Sobre</div>
         <div class="settings-info">
-          <strong>GymApp</strong> — versão <span id="about-version">2.0.0</span><br><br>
+          <strong>GymApp</strong> — versão <span id="about-version">3.0.0</span><br><br>
           Os dados são salvos localmente no <strong>localStorage</strong> do navegador. Use <strong>Exportar dados</strong> para criar um backup.<br><br>
           Para usar no iPhone como app: <strong>Safari → Compartilhar → Adicionar à Tela de Início</strong>.
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL-SCREEN WORKOUT DETAIL -->
+  <div id="workout-detail">
+    <div class="detail-topbar">
+      <button class="detail-icon-btn" onclick="closeWorkout()" aria-label="Voltar para a lista de treinos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="detail-icon-btn" id="detail-menu-btn" onclick="openWorkoutMenu(_currentWorkoutId)" aria-label="Opções do treino">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+      </button>
+    </div>
+    <div class="detail-scroll" id="detail-scroll"></div>
+  </div>
+
+  <!-- ACTION MENU SHEET (contextual ⋯) -->
+  <div id="action-menu" class="sheet-overlay" onclick="closeActionMenu()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h3 id="action-menu-title">Opções</h3>
+      <div class="menu-list" id="action-menu-list"></div>
+    </div>
+  </div>
+
+  <!-- RENAME SHEET -->
+  <div id="rename-sheet" class="sheet-overlay" onclick="closeRename()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h3 id="rename-title">Editar nome</h3>
+      <input id="rename-input" class="rename-input" type="text"
+        placeholder="Nome" aria-label="Nome" autocomplete="off"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();saveRename();}" />
+      <div class="rename-actions">
+        <button class="btn btn-ghost" onclick="closeRename()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveRename()">Salvar</button>
       </div>
     </div>
   </div>
@@ -561,7 +682,7 @@
 
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '3.0.0';
 
 // ── STATE ─────────────────────────────────────────────────
 let workouts = [], meals = [], currentTheme = 'black';
@@ -586,9 +707,9 @@ function uid() { return Math.random().toString(36).slice(2) + Date.now().toStrin
 // (evita injeção de HTML/JS via backup importado).
 function safeId(id) { return typeof id === 'string' && /^[a-z0-9]+$/i.test(id) ? id : uid(); }
 
-// Normaliza dados antigos (v1) e importados. Nunca lança erro;
-// entradas que não são objetos são ignoradas. O campo 'muscle'
-// dos exercícios da v1 é descartado silenciosamente.
+// Normaliza dados antigos (v1/v2) e importados. Nunca lança erro;
+// entradas que não são objetos são ignoradas. Os campos legados
+// 'muscle', 'sets', 'locked' e 'collapsed' são descartados (v3).
 function normalizeWorkouts(arr) {
   if (!Array.isArray(arr)) return [];
   const out = [];
@@ -597,9 +718,7 @@ function normalizeWorkouts(arr) {
     const nw = {
       id: safeId(w.id),
       name: typeof w.name === 'string' ? w.name : '',
-      exercises: [],
-      collapsed: !!w.collapsed,
-      locked: !!w.locked
+      exercises: []
     };
     if (typeof w.lastCompleted === 'string' && w.lastCompleted) nw.lastCompleted = w.lastCompleted;
     if (Array.isArray(w.exercises)) {
@@ -610,7 +729,6 @@ function normalizeWorkouts(arr) {
           name: typeof e.name === 'string' ? e.name : '',
           weight: e.weight != null ? String(e.weight) : '',
           reps: e.reps != null ? String(e.reps) : '',
-          sets: e.sets != null ? String(e.sets) : '',
           done: !!e.done
         });
       });
@@ -655,96 +773,139 @@ function applyTheme() {
 }
 
 // ── TABS ──────────────────────────────────────────────────
+let _activeTab = 'workout';
 function switchTab(name) {
+  _activeTab = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
-  // FAB do cronômetro só aparece na aba Treino
-  document.getElementById('timer-fab').style.display = name === 'workout' ? 'flex' : 'none';
+  updateFabVisibility();
+}
+// FAB do cronômetro aparece na aba Treino OU enquanto o detalhe
+// de um treino está aberto (mid-workout); some nas demais abas.
+function updateFabVisibility() {
+  const show = _activeTab === 'workout' || !!_currentWorkoutId;
+  document.getElementById('timer-fab').style.display = show ? 'flex' : 'none';
 }
 
 // ── SVG SNIPPETS ──────────────────────────────────────────
-const IC_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
-const IC_LOCK_OPEN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`;
-const IC_LOCK_CLOSED = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+const IC_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
 const IC_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>`;
 const IC_PLUS = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-const IC_COPY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>`;
-const IC_RESET = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>`;
-const IC_UP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="18 15 12 9 6 15"/></svg>`;
-const IC_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>`;
+const IC_COPY = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>`;
+const IC_UP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="18 15 12 9 6 15"/></svg>`;
+const IC_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="6 9 12 15 18 9"/></svg>`;
+const IC_DOTS = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="18" height="18"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>`;
+const IC_EDIT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>`;
+const IC_ADD_BIG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
 
 // ── WORKOUTS ──────────────────────────────────────────────
+// Treino aberto na tela full-screen (null = nenhum / lista visível).
+let _currentWorkoutId = null;
+
 function addWorkout() {
-  workouts.push({ id: uid(), name: 'Treino ' + (workouts.length + 1), exercises: [], collapsed: false, locked: false });
-  save(); renderWorkouts();
+  workouts.push({ id: uid(), name: 'Treino ' + (workouts.length + 1), exercises: [] });
+  save(); refreshWorkouts();
 }
 function removeWorkout(id) {
   workouts = workouts.filter(w => w.id !== id);
-  save(); renderWorkouts();
+  if (_currentWorkoutId === id) closeWorkout();
+  save(); refreshWorkouts();
 }
-function toggleWorkout(id) {
-  const w = workouts.find(w => w.id === id);
-  if (w) { w.collapsed = !w.collapsed; save(); renderWorkouts(); }
-}
-function toggleLock(id) {
-  const w = workouts.find(w => w.id === id);
-  if (w) { w.locked = !w.locked; save(); renderWorkouts(); }
+function moveWorkout(id, dir) {
+  const i = workouts.findIndex(w => w.id === id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= workouts.length) return;
+  const tmp = workouts[i]; workouts[i] = workouts[j]; workouts[j] = tmp;
+  save(); refreshWorkouts();
 }
 function duplicateWorkout(id) {
   const idx = workouts.findIndex(w => w.id === id);
   if (idx < 0) return;
   const w = workouts[idx];
-  if (w.locked) return;
   const copy = {
     id: uid(),
     name: w.name + ' (cópia)',
-    exercises: w.exercises.map(e => ({ id: uid(), name: e.name, weight: e.weight, reps: e.reps, sets: e.sets, done: false })),
-    collapsed: false,
-    locked: false
+    exercises: w.exercises.map(e => ({ id: uid(), name: e.name, weight: e.weight, reps: e.reps, done: false }))
   };
   workouts.splice(idx + 1, 0, copy);
-  save(); renderWorkouts();
+  save(); refreshWorkouts();
 }
+function updateWorkoutField(id, field, val) {
+  const w = workouts.find(w => w.id === id);
+  if (w) { w[field] = val; save(); }
+}
+
+// ── DETALHE FULL-SCREEN ───────────────────────────────────
+function openWorkout(id) {
+  const w = workouts.find(w => w.id === id);
+  if (!w) return;
+  _currentWorkoutId = id;
+  document.getElementById('workout-detail').classList.add('open');
+  document.body.classList.add('detail-open');
+  renderWorkoutDetail();
+  updateFabVisibility();
+}
+function closeWorkout() {
+  _currentWorkoutId = null;
+  document.getElementById('workout-detail').classList.remove('open');
+  document.body.classList.remove('detail-open');
+  updateFabVisibility();
+}
+
+// ── EXERCÍCIOS ────────────────────────────────────────────
 function addExercise(wid) {
   const w = workouts.find(w => w.id === wid);
-  if (!w || w.locked) return;
-  w.exercises.push({ id: uid(), name: '', weight: '', reps: '', sets: '', done: false });
-  save(); renderWorkouts();
+  if (!w) return;
+  const e = { id: uid(), name: '', weight: '', reps: '', done: false };
+  w.exercises.push(e);
+  save(); refreshWorkouts();
+  // Abre o renomear já para o usuário digitar o nome.
+  openRename({ type: 'exercise', wid: wid, eid: e.id });
 }
 function removeExercise(wid, eid) {
   const w = workouts.find(w => w.id === wid);
-  if (!w || w.locked) return;
+  if (!w) return;
   w.exercises = w.exercises.filter(e => e.id !== eid);
   if (w.exercises.length && w.exercises.every(x => x.done)) {
     w.lastCompleted = new Date().toISOString();
   }
-  save(); renderWorkouts();
+  save(); refreshWorkouts();
 }
 function moveExercise(wid, eid, dir) {
   const w = workouts.find(w => w.id === wid);
-  if (!w || w.locked) return;
+  if (!w) return;
   const i = w.exercises.findIndex(e => e.id === eid);
   const j = i + dir;
   if (i < 0 || j < 0 || j >= w.exercises.length) return;
-  const tmp = w.exercises[i];
-  w.exercises[i] = w.exercises[j];
-  w.exercises[j] = tmp;
-  save(); renderWorkouts();
+  const tmp = w.exercises[i]; w.exercises[i] = w.exercises[j]; w.exercises[j] = tmp;
+  save(); refreshWorkouts();
 }
-function updateWorkoutField(id, field, val) {
-  const w = workouts.find(w => w.id === id);
-  if (w && !w.locked) { w[field] = val; save(); }
+function duplicateExercise(wid, eid) {
+  const w = workouts.find(w => w.id === wid);
+  if (!w) return;
+  const idx = w.exercises.findIndex(e => e.id === eid);
+  if (idx < 0) return;
+  const e = w.exercises[idx];
+  w.exercises.splice(idx + 1, 0, { id: uid(), name: e.name, weight: e.weight, reps: e.reps, done: false });
+  save(); refreshWorkouts();
 }
 function updateExField(wid, eid, field, val) {
   const w = workouts.find(w => w.id === wid);
-  if (!w || w.locked) return;
+  if (!w) return;
   const e = w.exercises.find(e => e.id === eid);
-  if (e) { e[field] = val; save(); }
+  if (e) { e[field] = val; save(); } // sem re-render: os campos usam onchange (não rouba foco)
 }
-// Marcar exercício como feito é USO do treino, não edição:
-// permitido mesmo com o treino bloqueado.
+// Botão "+1": incrementa rapidamente as repetições.
+function incReps(wid, eid) {
+  const w = workouts.find(w => w.id === wid);
+  if (!w) return;
+  const e = w.exercises.find(e => e.id === eid);
+  if (!e) return;
+  e.reps = String((parseInt(e.reps, 10) || 0) + 1);
+  save(); refreshWorkouts();
+}
 function toggleExerciseDone(wid, eid) {
   const w = workouts.find(w => w.id === wid);
   if (!w) return;
@@ -754,104 +915,164 @@ function toggleExerciseDone(wid, eid) {
   if (w.exercises.length && w.exercises.every(x => x.done)) {
     w.lastCompleted = new Date().toISOString();
   }
-  save(); renderWorkouts();
-}
-function clearWorkoutDone(wid) {
-  const w = workouts.find(w => w.id === wid);
-  if (!w || w.locked) return;
-  w.exercises.forEach(e => { e.done = false; });
-  save(); renderWorkouts();
+  save(); refreshWorkouts();
 }
 
+// Re-renderiza a lista e, se aberto, o detalhe.
+function refreshWorkouts() {
+  renderWorkouts();
+  if (_currentWorkoutId) renderWorkoutDetail();
+}
+
+// Lista (aba Treino): linhas compactas que abrem o detalhe ao toque.
 function renderWorkouts() {
   const el = document.getElementById('workout-list');
   if (!workouts.length) {
     el.innerHTML = `<div class="empty-state">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      <div>Nenhum treino ainda.<br>Toque em <b>Novo treino</b> para começar.</div>
+      <div>Nenhum treino ainda.<br>Toque em <b>+</b> para criar o primeiro.</div>
     </div>`; return;
   }
-
   el.innerHTML = workouts.map(w => {
-    const locked = !!w.locked;
     const total = w.exercises.length;
     const done = w.exercises.filter(e => e.done).length;
-    const pct = total ? Math.round(done / total * 100) : 0;
+    const sub = total === 0 ? 'Sem exercícios' : (total === 1 ? '1 exercício' : total + ' exercícios');
     return `
-    <div class="card ${w.collapsed ? 'collapsed' : ''} ${locked ? 'locked-card' : ''}">
-      <div class="card-header" onclick="toggleWorkout('${w.id}')">
-        <input class="card-title" value="${esc(w.name)}"
-          onclick="event.stopPropagation()"
-          onchange="updateWorkoutField('${w.id}','name',this.value)"
-          placeholder="Nome do treino" aria-label="Nome do treino"
-          ${locked ? 'readonly' : ''} />
-        <div class="card-actions" onclick="event.stopPropagation()">
-          ${total ? `<span class="wk-progress">${done}/${total}</span>` : ''}
-          <button class="btn-lock ${locked ? 'locked' : ''}" onclick="toggleLock('${w.id}')"
-            title="${locked ? 'Desbloquear' : 'Bloquear'}" aria-label="${locked ? 'Desbloquear treino' : 'Bloquear treino'}">
-            ${locked ? IC_LOCK_CLOSED : IC_LOCK_OPEN}
-          </button>
-          <button class="btn-trash" onclick="removeWorkout('${w.id}')" title="Excluir treino" aria-label="Excluir treino" ${locked ? 'disabled' : ''}>${IC_TRASH}</button>
-          <span class="collapse-indicator">›</span>
+    <div class="card wk-card">
+      <div class="wk-row" onclick="openWorkout('${w.id}')">
+        <div class="wk-row-main">
+          <div class="wk-row-name">${esc(w.name) || 'Sem nome'}</div>
+          <div class="wk-row-sub">${sub}</div>
         </div>
-      </div>
-      ${total ? `<div class="progress-track wk-track"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
-      <div class="card-body">
-        ${w.lastCompleted ? `<p class="last-completed">Último treino completo: ${fmtDate(w.lastCompleted)}</p>` : ''}
-        ${total ? w.exercises.map((e, i) => `
-          <div class="ex-item ${e.done ? 'done' : ''}">
-            <div class="ex-line1">
-              <button class="check-btn ${e.done ? 'checked' : ''}"
-                onclick="toggleExerciseDone('${w.id}','${e.id}')"
-                aria-label="${e.done ? 'Desmarcar exercício' : 'Marcar exercício como feito'}">${IC_CHECK}</button>
-              <textarea class="ex-input ex-name"
-                placeholder="Nome do exercício" aria-label="Nome do exercício"
-                oninput="autoResize(this)"
-                onchange="updateExField('${w.id}','${e.id}','name',this.value)"
-                ${locked ? 'readonly' : ''}
-              >${esc(e.name)}</textarea>
-              <button class="btn-trash" onclick="removeExercise('${w.id}','${e.id}')" aria-label="Excluir exercício" ${locked ? 'disabled' : ''}>${IC_TRASH}</button>
-            </div>
-            <div class="ex-line2">
-              <div class="ex-field">
-                <label>Séries</label>
-                <input class="ex-input ex-num" type="number" inputmode="numeric" min="0"
-                  value="${esc(e.sets)}" placeholder="—" aria-label="Séries"
-                  onchange="updateExField('${w.id}','${e.id}','sets',this.value)"
-                  ${locked ? 'readonly' : ''} />
-              </div>
-              <div class="ex-field">
-                <label>Reps</label>
-                <input class="ex-input ex-num" type="number" inputmode="numeric" min="0"
-                  value="${esc(e.reps)}" placeholder="—" aria-label="Repetições"
-                  onchange="updateExField('${w.id}','${e.id}','reps',this.value)"
-                  ${locked ? 'readonly' : ''} />
-              </div>
-              <div class="ex-field">
-                <label>Kg</label>
-                <input class="ex-input ex-num" type="number" inputmode="decimal" min="0" step="0.5"
-                  value="${esc(e.weight)}" placeholder="—" aria-label="Carga em quilos"
-                  onchange="updateExField('${w.id}','${e.id}','weight',this.value)"
-                  ${locked ? 'readonly' : ''} />
-              </div>
-              ${!locked ? `
-              <div class="ex-reorder">
-                <button class="btn-arrow" onclick="moveExercise('${w.id}','${e.id}',-1)" aria-label="Mover exercício para cima" ${i === 0 ? 'disabled' : ''}>${IC_UP}</button>
-                <button class="btn-arrow" onclick="moveExercise('${w.id}','${e.id}',1)" aria-label="Mover exercício para baixo" ${i === total - 1 ? 'disabled' : ''}>${IC_DOWN}</button>
-              </div>` : ''}
-            </div>
-          </div>
-        `).join('') : `<p style="color:var(--muted);font-size:13px;margin-bottom:10px;">Nenhum exercício adicionado.</p>`}
-        ${!locked ? `
-          <div class="card-foot">
-            <button class="add-row-btn" onclick="addExercise('${w.id}')">${IC_PLUS} Adicionar exercício</button>
-            <button class="add-row-btn" onclick="duplicateWorkout('${w.id}')">${IC_COPY} Duplicar treino</button>
-            ${done ? `<button class="add-row-btn" onclick="clearWorkoutDone('${w.id}')">${IC_RESET} Limpar marcações</button>` : ''}
-          </div>` : `
-          <p class="locked-note">${IC_LOCK_CLOSED} Treino bloqueado</p>`}
+        <div class="wk-row-right" onclick="event.stopPropagation()">
+          ${total ? `<span class="wk-row-progress">${done}/${total}</span>` : ''}
+          <button class="btn-dots" onclick="openWorkoutMenu('${w.id}')" aria-label="Opções do treino">${IC_DOTS}</button>
+          <span class="wk-chevron">›</span>
+        </div>
       </div>
     </div>`;
   }).join('');
+}
+
+// Detalhe full-screen do treino atual.
+function renderWorkoutDetail() {
+  const w = workouts.find(w => w.id === _currentWorkoutId);
+  const el = document.getElementById('detail-scroll');
+  if (!w) { el.innerHTML = ''; return; }
+  const total = w.exercises.length;
+  const done = w.exercises.filter(e => e.done).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  el.innerHTML = `
+    <div class="detail-title">${esc(w.name) || 'Sem nome'}</div>
+    <div class="detail-sub">${total ? done + ' de ' + total + ' concluídos' : 'Sem exercícios'}</div>
+    ${w.lastCompleted ? `<div class="detail-last">Último treino completo: ${fmtDate(w.lastCompleted)}</div>` : ''}
+    ${total ? `<div class="progress-track detail-track"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
+    <div class="detail-ex-list">
+      ${total ? w.exercises.map((e, i) => `
+        <div class="ex-item ${e.done ? 'done' : ''}">
+          <div class="ex-line1">
+            <button class="check-btn ${e.done ? 'checked' : ''}"
+              onclick="toggleExerciseDone('${w.id}','${e.id}')"
+              aria-label="${e.done ? 'Desmarcar exercício' : 'Marcar exercício como feito'}">${IC_CHECK}</button>
+            <button class="ex-name" onclick="openRename({type:'exercise',wid:'${w.id}',eid:'${e.id}'})"
+              aria-label="Editar nome do exercício">${esc(e.name) || 'Toque para nomear'}</button>
+            <button class="btn-dots" onclick="openExerciseMenu('${w.id}','${e.id}')" aria-label="Opções do exercício">${IC_DOTS}</button>
+          </div>
+          <div class="ex-pills">
+            <div class="pill">
+              <input type="number" inputmode="decimal" min="0" step="0.5" value="${esc(e.weight)}" placeholder="0"
+                aria-label="Carga em quilos" onchange="updateExField('${w.id}','${e.id}','weight',this.value)" />
+              <span class="pill-unit">kg</span>
+            </div>
+            <div class="pill">
+              <input type="number" inputmode="numeric" min="0" value="${esc(e.reps)}" placeholder="0"
+                aria-label="Repetições" onchange="updateExField('${w.id}','${e.id}','reps',this.value)" />
+              <span class="pill-unit">reps</span>
+            </div>
+            <button class="btn-plus1" onclick="incReps('${w.id}','${e.id}')" aria-label="Adicionar 1 repetição">${IC_PLUS}1</button>
+          </div>
+        </div>
+      `).join('') : `<p style="color:var(--muted);font-size:14px;padding:12px 0;">Nenhum exercício ainda.</p>`}
+    </div>
+    <button class="add-row-btn" style="margin-top:18px;font-size:15px;" onclick="addExercise('${w.id}')">${IC_ADD_BIG} Adicionar exercício</button>
+  `;
+}
+
+// ── MENU DE OPÇÕES (⋯) ────────────────────────────────────
+let _menuActions = [];
+function buildMenu(title, actions) {
+  _menuActions = actions;
+  document.getElementById('action-menu-title').textContent = title;
+  document.getElementById('action-menu-list').innerHTML = actions.map((a, idx) => `
+    <button class="menu-action ${a.danger ? 'danger' : ''}" ${a.disabled ? 'disabled' : ''}
+      onclick="runMenuAction(${idx})">${a.icon}<span>${a.label}</span></button>
+  `).join('');
+  document.getElementById('action-menu').classList.add('open');
+}
+function runMenuAction(idx) {
+  const a = _menuActions[idx];
+  closeActionMenu();
+  if (a && typeof a.run === 'function') a.run();
+}
+function closeActionMenu() {
+  document.getElementById('action-menu').classList.remove('open');
+}
+function openWorkoutMenu(id) {
+  const i = workouts.findIndex(w => w.id === id);
+  if (i < 0) return;
+  buildMenu('Opções do treino', [
+    { label: 'Editar nome',      icon: IC_EDIT, run: () => openRename({ type: 'workout', wid: id }) },
+    { label: 'Mover para cima',  icon: IC_UP,   disabled: i === 0,                   run: () => moveWorkout(id, -1) },
+    { label: 'Mover para baixo', icon: IC_DOWN, disabled: i === workouts.length - 1, run: () => moveWorkout(id, 1) },
+    { label: 'Duplicar',         icon: IC_COPY, run: () => duplicateWorkout(id) },
+    { label: 'Excluir',          icon: IC_TRASH, danger: true, run: () => removeWorkout(id) },
+  ]);
+}
+function openExerciseMenu(wid, eid) {
+  const w = workouts.find(w => w.id === wid);
+  if (!w) return;
+  const i = w.exercises.findIndex(e => e.id === eid);
+  if (i < 0) return;
+  buildMenu('Opções do exercício', [
+    { label: 'Editar nome',      icon: IC_EDIT, run: () => openRename({ type: 'exercise', wid, eid }) },
+    { label: 'Mover para cima',  icon: IC_UP,   disabled: i === 0,                       run: () => moveExercise(wid, eid, -1) },
+    { label: 'Mover para baixo', icon: IC_DOWN, disabled: i === w.exercises.length - 1,  run: () => moveExercise(wid, eid, 1) },
+    { label: 'Duplicar',         icon: IC_COPY, run: () => duplicateExercise(wid, eid) },
+    { label: 'Excluir',          icon: IC_TRASH, danger: true, run: () => removeExercise(wid, eid) },
+  ]);
+}
+
+// ── RENOMEAR (treino / exercício) ─────────────────────────
+let _renameCtx = null;
+function openRename(ctx) {
+  _renameCtx = ctx;
+  let current = '';
+  if (ctx.type === 'workout') {
+    const w = workouts.find(w => w.id === ctx.wid);
+    current = w ? w.name : '';
+    document.getElementById('rename-title').textContent = 'Nome do treino';
+  } else {
+    const w = workouts.find(w => w.id === ctx.wid);
+    const e = w && w.exercises.find(e => e.id === ctx.eid);
+    current = e ? e.name : '';
+    document.getElementById('rename-title').textContent = 'Nome do exercício';
+  }
+  const input = document.getElementById('rename-input');
+  input.value = current;
+  document.getElementById('rename-sheet').classList.add('open');
+  setTimeout(() => { input.focus(); input.select(); }, 60);
+}
+function saveRename() {
+  if (!_renameCtx) { closeRename(); return; }
+  const val = document.getElementById('rename-input').value;
+  if (_renameCtx.type === 'workout') updateWorkoutField(_renameCtx.wid, 'name', val);
+  else updateExField(_renameCtx.wid, _renameCtx.eid, 'name', val);
+  closeRename();
+  refreshWorkouts();
+}
+function closeRename() {
+  document.getElementById('rename-sheet').classList.remove('open');
+  _renameCtx = null;
 }
 
 // ── REST TIMER ────────────────────────────────────────────
@@ -1095,7 +1316,7 @@ function renderMeals() {
 
 // ── DADOS (EXPORT / IMPORT / RESET) ───────────────────────
 function exportData() {
-  const data = { version: 2, exportedAt: new Date().toISOString(), theme: currentTheme, workouts, meals };
+  const data = { version: 3, exportedAt: new Date().toISOString(), theme: currentTheme, workouts, meals };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1179,9 +1400,6 @@ function autoResizeAll() {
 }
 
 // ── INIT ──────────────────────────────────────────────────
-const _origRenderWorkouts = renderWorkouts;
-renderWorkouts = function() { _origRenderWorkouts(); requestAnimationFrame(autoResizeAll); };
-
 load(); applyTheme(); renderWorkouts(); renderMeals(); renderTimer();
 document.getElementById('about-version').textContent = APP_VERSION;
 
