@@ -26,6 +26,9 @@
       /* ponytail: knobs da tab bar — altura e quanto do safe-area vira
          padding (iPhone). Ajuste aqui se a barra parecer alta/baixa. */
       --tab-h: 56px; --safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* Status bar do iOS: a webview é black-translucent + viewport-fit=cover,
+         então o topo precisa descontar o safe-area (0 no navegador). */
+      --safe-top: env(safe-area-inset-top, 0px);
       --tab-bg: rgba(0,0,0,0.92); --glow: 0 0 16px rgba(168,85,247,.18);
     }
     [data-theme="purple"] {
@@ -75,11 +78,13 @@
     .page.active { display: flex; }
     .page-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 16px 90px; }
     .page-header {
-      padding: 60px 20px 16px; font-size: 34px; font-weight: 800; letter-spacing: -.8px;
+      padding: calc(var(--safe-top) + 16px) 20px 16px;
+      font-size: 34px; font-weight: 800; letter-spacing: -.8px;
       transition: padding .2s ease, font-size .2s ease;
     }
-    /* Header encolhe ao rolar e devolve ~48px de tela para a lista. */
-    .page.compact .page-header { padding-top: 22px; padding-bottom: 10px; font-size: 21px; }
+    /* Header encolhe ao rolar. O safe-area é intocável — só a folga decorativa
+       e o corpo da fonte cedem, senão o título entra embaixo do relógio. */
+    .page.compact .page-header { padding-top: calc(var(--safe-top) + 6px); padding-bottom: 10px; font-size: 21px; }
     .page.compact .header-add-btn { width: 36px; height: 36px; }
     .page.compact .header-add-btn svg { width: 18px; height: 18px; }
 
@@ -194,7 +199,7 @@
        absorve o safe-area do topo (a topbar abaixo usa padding fixo). */
     .detail-grabber {
       width: 36px; height: 4px; border-radius: 2px; background: var(--border);
-      margin: calc(env(safe-area-inset-top, 0px) + 10px) auto 0; flex-shrink: 0;
+      margin: calc(var(--safe-top) + 10px) auto 0; flex-shrink: 0;
     }
     .detail-title { font-size: 30px; font-weight: 800; letter-spacing: -.6px; word-break: break-word; }
     .detail-sub { font-size: 13px; color: var(--muted2); margin-top: 6px; }
@@ -677,7 +682,7 @@
       <div class="settings-section">
         <div class="settings-label">Sobre</div>
         <div class="settings-info">
-          <strong>Void</strong> — versão <span id="about-version">4.6.0</span><br>
+          <strong>Void</strong> — versão <span id="about-version">4.6.1</span><br>
           <span style="color:var(--muted2)">Treino vira XP. XP vira rank.</span><br><br>
           Os dados são salvos localmente no <strong>localStorage</strong> do navegador. Use <strong>Exportar dados</strong> para criar um backup.<br><br>
           Para usar no iPhone como app: <strong>Safari → Compartilhar → Adicionar à Tela de Início</strong>.
@@ -845,7 +850,7 @@ Frango, arroz e salada
 
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────
-const APP_VERSION = '4.6.0';
+const APP_VERSION = '4.6.1';
 
 // ── GAMIFICAÇÃO (ranks por grupo muscular) ────────────────
 // XP fixo por exercício concluído (1x por dia por exercício).
@@ -1996,7 +2001,7 @@ function attachSwipeClose(screenId, scrollId, close) {
 
 // Header encolhe depois de um pouco de rolagem. Histerese (40/20) evita
 // tremer no limite. O piso de 120px de espaço rolável evita laço: encolher
-// devolve ~48px de altura e, em lista curta, o clamp do scroll voltaria ao topo.
+// devolve ~26px de altura e, em lista curta, o clamp do scroll voltaria ao topo.
 function attachHeaderCollapse() {
   document.querySelectorAll('.page').forEach(page => {
     const scroll = page.querySelector('.page-scroll');

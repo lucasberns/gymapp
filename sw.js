@@ -1,4 +1,4 @@
-const CACHE = "gymapp-v4.6.0";
+const CACHE = "gymapp-v4.6.1";
 
 const PRECACHE = [
   "./",
