@@ -22,11 +22,11 @@
       --border: #222; --accent: #fff;
       --accent-btn: #fff; --accent-btn-text: #000;
       --muted: #555; --muted2: #888; --danger: #e53935;
-      --highlight: #fff; --radius: 12px;
+      --highlight: #a855f7; --radius: 12px;
       /* ponytail: knobs da tab bar — altura e quanto do safe-area vira
          padding (iPhone). Ajuste aqui se a barra parecer alta/baixa. */
       --tab-h: 56px; --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --tab-bg: rgba(0,0,0,0.92); --glow: none;
+      --tab-bg: rgba(0,0,0,0.92); --glow: 0 0 16px rgba(168,85,247,.18);
     }
     [data-theme="purple"] {
       --bg: #08000f; --surface: #110820; --surface2: #1c0f2e;
@@ -34,7 +34,7 @@
       --accent-btn: #a855f7; --accent-btn-text: #fff;
       --muted: #5c4478; --muted2: #9b72c8; --danger: #f87171;
       --highlight: #c084fc; --tab-bg: rgba(8,0,15,0.92);
-      --glow: 0 0 20px rgba(168,85,247,.12);
+      --glow: 0 0 24px rgba(168,85,247,.35);
     }
 
     html, body {
@@ -67,13 +67,21 @@
       transition: color .15s;
     }
     .tab-btn.active { color: var(--highlight); }
-    .tab-btn svg { width: 22px; height: 22px; }
+    .tab-btn svg { width: 22px; height: 22px; transition: transform .15s; }
+    .tab-btn.active svg { transform: scale(1.1); filter: drop-shadow(0 0 6px rgba(168,85,247,.6)); }
 
     /* ── PAGES ── */
     .page { display: none; flex-direction: column; flex: 1; overflow: hidden; padding-bottom: calc(var(--tab-h) + var(--safe-bottom)); }
     .page.active { display: flex; }
     .page-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 16px 90px; }
-    .page-header { padding: 60px 20px 16px; font-size: 34px; font-weight: 800; letter-spacing: -.8px; }
+    .page-header {
+      padding: 60px 20px 16px; font-size: 34px; font-weight: 800; letter-spacing: -.8px;
+      transition: padding .2s ease, font-size .2s ease;
+    }
+    /* Header encolhe ao rolar e devolve ~48px de tela para a lista. */
+    .page.compact .page-header { padding-top: 22px; padding-bottom: 10px; font-size: 21px; }
+    .page.compact .header-add-btn { width: 36px; height: 36px; }
+    .page.compact .header-add-btn svg { width: 18px; height: 18px; }
 
     /* Treino header is a row: big title + round add button */
     .page-header.header-row {
@@ -84,19 +92,19 @@
       width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
       background: var(--accent-btn); color: var(--accent-btn-text);
       border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: var(--glow); transition: opacity .15s;
+      box-shadow: var(--glow); transition: opacity .15s, transform .15s, width .2s ease, height .2s ease;
     }
-    .header-add-btn:active { opacity: .7; }
-    .header-add-btn svg { width: 22px; height: 22px; }
+    .header-add-btn:active { opacity: .7; transform: scale(.9); }
+    .header-add-btn svg { width: 22px; height: 22px; transition: width .2s ease, height .2s ease; }
 
     /* ── BUTTONS ── */
     .btn {
       display: inline-flex; align-items: center; justify-content: center;
       gap: 6px; border: none; border-radius: 8px; cursor: pointer;
-      font-size: 14px; font-weight: 600; padding: 10px 16px; transition: opacity .15s;
+      font-size: 14px; font-weight: 600; padding: 10px 16px; transition: opacity .15s, transform .15s;
       font-family: inherit;
     }
-    .btn:active { opacity: .6; }
+    .btn:active { opacity: .6; transform: scale(.96); }
     .btn-primary { background: var(--accent-btn); color: var(--accent-btn-text); }
     .btn-ghost { background: none; border: 1px solid var(--border); color: var(--muted2); }
 
@@ -116,10 +124,10 @@
       border: 2px solid var(--border); background: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; padding: 0; color: transparent;
-      transition: border-color .15s, background .15s, color .15s;
+      transition: border-color .15s, background .15s, color .15s, transform .15s, box-shadow .15s;
     }
-    .check-btn:active { border-color: var(--muted2); }
-    .check-btn.checked { background: var(--highlight); border-color: var(--highlight); color: var(--accent-btn-text); }
+    .check-btn:active { border-color: var(--muted2); transform: scale(.88); }
+    .check-btn.checked { background: var(--highlight); border-color: var(--highlight); color: var(--accent-btn-text); box-shadow: 0 0 10px rgba(168,85,247,.55); }
 
     /* ── CARD ── */
     .card {
@@ -169,7 +177,7 @@
     .detail-screen.open { display: flex; transform: translateY(0); }
     .detail-topbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: calc(env(safe-area-inset-top, 0px) + 16px) 12px 8px;
+      padding: 10px 12px 8px;
       flex-shrink: 0;
     }
     .detail-icon-btn {
@@ -180,7 +188,14 @@
     }
     .detail-icon-btn:active, .detail-icon-btn:hover { background: var(--surface2); }
     .detail-icon-btn svg { width: 24px; height: 24px; }
-    .detail-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 16px calc(var(--safe-bottom) + 120px); }
+    /* overscroll contain: o swipe-down para fechar não briga com o rubber-band. */
+    .detail-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 8px 16px calc(var(--safe-bottom) + 120px); }
+    /* Alça: sinaliza que a tela pode ser arrastada para baixo. Ela é quem
+       absorve o safe-area do topo (a topbar abaixo usa padding fixo). */
+    .detail-grabber {
+      width: 36px; height: 4px; border-radius: 2px; background: var(--border);
+      margin: calc(env(safe-area-inset-top, 0px) + 10px) auto 0; flex-shrink: 0;
+    }
     .detail-title { font-size: 30px; font-weight: 800; letter-spacing: -.6px; word-break: break-word; }
     .detail-sub { font-size: 13px; color: var(--muted2); margin-top: 6px; }
     .detail-last { font-size: 12px; color: var(--muted2); margin-top: 2px; }
@@ -224,6 +239,14 @@
     }
     .btn-plus1:active { border-color: var(--highlight); color: var(--highlight); }
     .btn-plus1 svg { width: 12px; height: 12px; }
+
+    /* Recorde de carga: última entrada do histórico bate todas as anteriores. */
+    .pr-badge {
+      font-size: 10px; font-weight: 800; letter-spacing: .6px;
+      color: var(--highlight); border: 1px solid var(--highlight);
+      border-radius: 999px; padding: 5px 10px; flex-shrink: 0;
+      box-shadow: 0 0 10px rgba(168,85,247,.35);
+    }
 
     /* ── INPUTS ── */
     .ex-input {
@@ -312,11 +335,14 @@
     .chart { width: 100%; height: 76px; display: block; margin-bottom: 12px; }
 
     /* ── STATS / RANKS ── */
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
     .stat-tile {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 14px; text-align: center; box-shadow: var(--glow);
+      border-radius: var(--radius); padding: 14px 8px; text-align: center; box-shadow: var(--glow);
     }
+    /* Sequência ativa (2+ dias) ganha destaque — é o número que puxa o retorno. */
+    .stat-tile.hot { border-color: var(--highlight); box-shadow: 0 0 16px rgba(168,85,247,.3); }
+    .stat-tile.hot .stat-value { color: var(--highlight); }
     .stat-value { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
     .stat-label { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
     .rank-card {
@@ -344,12 +370,13 @@
       background: var(--accent-btn); color: var(--accent-btn-text);
       border: none; cursor: pointer; z-index: 160;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(0,0,0,.45);
+      box-shadow: 0 4px 16px rgba(0,0,0,.45), 0 0 18px rgba(168,85,247,.35);
+      transition: opacity .15s, transform .15s;
     }
     /* When the full-screen detail is open it covers the tab bar,
        so the FAB sits closer to the bottom edge. */
     body.detail-open #timer-fab { bottom: calc(var(--safe-bottom) + 24px); }
-    #timer-fab:active { opacity: .8; }
+    #timer-fab:active { opacity: .8; transform: scale(.92); }
     #timer-fab svg { width: 26px; height: 26px; }
     .fab-badge {
       position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
@@ -448,9 +475,9 @@
     .settings-section { margin-bottom: 28px; }
     .settings-label { font-size: 11px; color: var(--muted2); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; padding: 0 4px; }
     .theme-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .theme-card { border-radius: 14px; border: 2px solid var(--border); padding: 16px; cursor: pointer; transition: border-color .2s; display: flex; flex-direction: column; gap: 10px; }
-    .theme-card.selected { border-color: var(--highlight); }
-    .theme-card:active { opacity: .8; }
+    .theme-card { border-radius: 14px; border: 2px solid var(--border); padding: 16px; cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; display: flex; flex-direction: column; gap: 10px; }
+    .theme-card.selected { border-color: var(--highlight); box-shadow: 0 0 14px rgba(168,85,247,.3); }
+    .theme-card:active { opacity: .8; transform: scale(.97); }
     .theme-card-top { display: flex; justify-content: space-between; align-items: center; }
     .theme-preview { border-radius: 8px; height: 60px; display: flex; align-items: flex-end; padding: 8px; gap: 4px; }
     .theme-preview-bar { border-radius: 3px; height: 4px; flex: 1; }
@@ -481,6 +508,43 @@
     .settings-btn.danger { color: var(--danger); border-color: rgba(229,57,53,.35); }
     .settings-btn.danger svg { color: var(--danger); }
     .settings-btn input[type=file] { display: none; }
+
+    /* ── TOGGLE (switch) ── */
+    /* O checkbox fica invisível mas focável — teclado e leitor de tela seguem funcionando. */
+    .settings-toggle { position: relative; cursor: pointer; }
+    .settings-toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+    .toggle-main { flex: 1; min-width: 0; }
+    .toggle-sub { font-size: 12px; font-weight: 400; color: var(--muted2); margin-top: 3px; line-height: 1.4; }
+    .switch {
+      width: 44px; height: 26px; border-radius: 999px; flex-shrink: 0; position: relative;
+      background: var(--surface2); border: 1px solid var(--border);
+      transition: background .2s, border-color .2s, box-shadow .2s;
+    }
+    .switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%; background: var(--muted2);
+      transition: transform .2s ease, background .2s;
+    }
+    .settings-toggle input:checked + .switch {
+      background: var(--accent-btn); border-color: var(--highlight);
+      box-shadow: 0 0 12px rgba(168,85,247,.4);
+    }
+    .settings-toggle input:checked + .switch::after { transform: translateX(18px); background: var(--accent-btn-text); }
+    .settings-toggle input:focus-visible + .switch { outline: 2px solid var(--highlight); outline-offset: 2px; }
+
+    /* Tempo de descanso: só faz sentido com o cronômetro automático ligado. */
+    .rest-row { display: flex; align-items: center; gap: 10px; }
+    .rest-row.off { opacity: .4; pointer-events: none; }
+    .rest-row input { width: 74px; text-align: center; }
+
+    /* ── REDUCED MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -573,6 +637,27 @@
       </div>
 
       <div class="settings-section">
+        <div class="settings-label">Treino</div>
+        <label class="settings-btn settings-toggle">
+          <span class="toggle-main">
+            Cronômetro automático
+            <span class="toggle-sub">Inicia o descanso ao marcar um exercício</span>
+          </span>
+          <input type="checkbox" id="auto-timer-toggle" onchange="setAutoTimer(this.checked)" />
+          <span class="switch"></span>
+        </label>
+        <div class="settings-btn rest-row" id="rest-row">
+          <span class="toggle-main">
+            Tempo de descanso
+            <span class="toggle-sub">Segundos por série</span>
+          </span>
+          <input class="ex-input" type="number" inputmode="numeric" min="1" max="5999"
+            id="rest-secs-input" aria-label="Tempo de descanso em segundos"
+            onchange="setRestSecs(this.value)" />
+        </div>
+      </div>
+
+      <div class="settings-section">
         <div class="settings-label">Dados</div>
         <button class="settings-btn" onclick="exportData()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -592,7 +677,7 @@
       <div class="settings-section">
         <div class="settings-label">Sobre</div>
         <div class="settings-info">
-          <strong>Void</strong> — versão <span id="about-version">4.4.0</span><br>
+          <strong>Void</strong> — versão <span id="about-version">4.6.0</span><br>
           <span style="color:var(--muted2)">Treino vira XP. XP vira rank.</span><br><br>
           Os dados são salvos localmente no <strong>localStorage</strong> do navegador. Use <strong>Exportar dados</strong> para criar um backup.<br><br>
           Para usar no iPhone como app: <strong>Safari → Compartilhar → Adicionar à Tela de Início</strong>.
@@ -603,6 +688,7 @@
 
   <!-- FULL-SCREEN WORKOUT DETAIL -->
   <div id="workout-detail" class="detail-screen">
+    <div class="detail-grabber"></div>
     <div class="detail-topbar">
       <button class="detail-icon-btn" onclick="closeWorkout()" aria-label="Voltar para a lista de treinos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -616,6 +702,7 @@
 
   <!-- FULL-SCREEN MEAL DETAIL -->
   <div id="meal-detail" class="detail-screen">
+    <div class="detail-grabber"></div>
     <div class="detail-topbar">
       <button class="detail-icon-btn" onclick="closeMeal()" aria-label="Voltar para a lista de refeições">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -758,7 +845,7 @@ Frango, arroz e salada
 
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────
-const APP_VERSION = '4.4.0';
+const APP_VERSION = '4.6.0';
 
 // ── GAMIFICAÇÃO (ranks por grupo muscular) ────────────────
 // XP fixo por exercício concluído (1x por dia por exercício).
@@ -778,15 +865,17 @@ const RANKS = [
 ];
 const GROUP_LABELS = {
   peito: 'Peito', costas: 'Costas', pernas: 'Pernas', ombros: 'Ombros',
-  biceps: 'Bíceps', triceps: 'Tríceps', abdomen: 'Abdômen', outros: 'Outros'
+  biceps: 'Bíceps', triceps: 'Tríceps', antebraco: 'Antebraço', abdomen: 'Abdômen', outros: 'Outros'
 };
-// Ordem importa: tríceps antes de bíceps ("rosca testa/francesa" é tríceps).
+// Ordem importa: antebraço antes de bíceps/peito ("rosca supinada ante", "flexão de punho").
+// Tríceps antes de bíceps ("rosca testa/francesa" é tríceps).
 const GROUP_KEYWORDS = [
+  ['antebraco', ['antebraço', 'antebraco', 'punho', 'ante']],
   ['triceps', ['tríceps', 'triceps', 'testa', 'francês', 'frances', 'coice', 'mergulho', 'paralela']],
   ['biceps',  ['bíceps', 'biceps', 'rosca', 'martelo', 'scott']],
   ['peito',   ['supino', 'crucifixo', 'cross', 'peck', 'flexão', 'flexao', 'fly', 'chest', 'voador']],
   ['costas',  ['remada', 'puxada', 'pulldown', 'barra fixa', 'pull', 'serrote', 'terra', 'levantamento']],
-  ['pernas',  ['agachamento', 'leg', 'cadeira', 'flexor', 'extensor', 'afundo', 'avanço', 'avanco', 'stiff', 'panturrilha', 'hack', 'búlgaro', 'bulgaro', 'passada', 'sumô', 'sumo', 'adutor', 'abdutor', 'glúteo', 'gluteo', 'gêmeos', 'gemeos']],
+  ['pernas',  ['agachamento', 'leg', 'cadeira', 'flexor', 'extensor', 'afundo', 'avanço', 'avanco', 'stiff', 'panturrilha', 'hack', 'búlgaro', 'bulgaro', 'passada', 'sumô', 'sumo', 'adutor', 'abdutor', 'glúteo', 'gluteo', 'gêmeos', 'gemeos', 'smith']],
   ['ombros',  ['desenvolvimento', 'elevação', 'elevacao', 'arnold', 'militar', 'face pull', 'encolhimento', 'lateral', 'frontal']],
   ['abdomen', ['abdominal', 'abdômen', 'abdomen', 'prancha', 'infra', 'supra', 'oblíquo', 'obliquo', 'abs']],
 ];
@@ -800,25 +889,63 @@ function rankFor(xp) {
   while (i + 1 < RANKS.length && xp >= RANKS[i + 1].xp) i++;
   return { cur: RANKS[i], next: RANKS[i + 1] || null };
 }
+// Rank alcançado entre dois valores de XP (null = continuou na mesma faixa).
+function rankUp(before, after) {
+  const a = rankFor(before).cur, b = rankFor(after).cur;
+  return a.name === b.name ? null : b;
+}
 function localDay(d) {
   d = d || new Date();
   const p = n => String(n).padStart(2, '0');
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
 }
+// Dias treinados consecutivos. O dia de hoje ainda em branco não zera a
+// sequência (conta a partir de ontem) — só um dia inteiro perdido quebra.
+function streakDays() {
+  const set = new Set(stats.days);
+  const d = new Date();
+  if (!set.has(localDay(d))) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (set.has(localDay(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+// Recorde de carga: a última entrada do histórico bate todas as anteriores.
+function isPR(e) {
+  const h = e.hist || [];
+  if (h.length < 2) return false;
+  const last = parseFloat(h[h.length - 1].w) || 0;
+  if (!last) return false;
+  return last > Math.max(...h.slice(0, -1).map(x => parseFloat(x.w) || 0));
+}
+// "hoje" / "ontem" / "há N dias" na semana; data cheia depois disso.
+function relDays(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const n = Math.round((new Date(localDay()) - new Date(localDay(d))) / 86400000);
+  if (n <= 0) return 'hoje';
+  if (n === 1) return 'ontem';
+  if (n < 7) return 'há ' + n + ' dias';
+  return fmtDate(iso);
+}
 
 // ── STATE ─────────────────────────────────────────────────
 let workouts = [], meals = [], currentTheme = 'black';
 let stats = { xp: {}, days: [] };
+// Preferências num objeto só (uma chave no localStorage, um normalize).
+let prefs = { autoTimer: false, restSecs: 90 };
+const REST_DEFAULT = 90;
 
 // ── PERSISTENCE + MIGRATION ───────────────────────────────
 function load() {
-  let rawW = [], rawM = [], rawS = null;
+  let rawW = [], rawM = [], rawS = null, rawP = null;
   try { rawW = JSON.parse(localStorage.getItem('gym_workouts') || '[]'); } catch { rawW = []; }
   try { rawM = JSON.parse(localStorage.getItem('gym_meals') || '[]'); } catch { rawM = []; }
   try { rawS = JSON.parse(localStorage.getItem('gym_stats') || 'null'); } catch { rawS = null; }
+  try { rawP = JSON.parse(localStorage.getItem('gym_prefs') || 'null'); } catch { rawP = null; }
   workouts = normalizeWorkouts(rawW);
   meals = normalizeMeals(rawM);
   stats = normalizeStats(rawS);
+  prefs = normalizePrefs(rawP);
   currentTheme = localStorage.getItem('gym_theme') || 'black';
   if (currentTheme !== 'black' && currentTheme !== 'purple') currentTheme = 'black';
 }
@@ -826,6 +953,7 @@ function save() {
   localStorage.setItem('gym_workouts', JSON.stringify(workouts));
   localStorage.setItem('gym_meals',    JSON.stringify(meals));
   localStorage.setItem('gym_stats',    JSON.stringify(stats));
+  localStorage.setItem('gym_prefs',    JSON.stringify(prefs));
 }
 function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
 // Ids são interpolados em handlers onclick no HTML; só aceita o
@@ -850,7 +978,7 @@ function normalizeWorkouts(arr) {
     if (Array.isArray(w.exercises)) {
       w.exercises.forEach(e => {
         if (!e || typeof e !== 'object' || Array.isArray(e)) return;
-        nw.exercises.push({
+        const ne = {
           id: safeId(e.id),
           name: typeof e.name === 'string' ? e.name : '',
           weight: e.weight != null ? String(e.weight) : '',
@@ -861,7 +989,10 @@ function normalizeWorkouts(arr) {
                 .slice(-30)
                 .map(h => ({ d: h.d, w: h.w != null ? String(h.w) : '', r: h.r != null ? String(h.r) : '' }))
             : []
-        });
+        };
+        // Dia do último XP (v4.5+): evita repontuar o mesmo exercício no dia.
+        if (typeof e.xpDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.xpDay)) ne.xpDay = e.xpDay;
+        nw.exercises.push(ne);
       });
     }
     out.push(nw);
@@ -902,6 +1033,16 @@ function normalizeStats(s) {
   }
   return out;
 }
+// Mesma faixa aceita pelo cronômetro manual (1..5999 s).
+function normalizePrefs(p) {
+  const out = { autoTimer: false, restSecs: REST_DEFAULT };
+  if (p && typeof p === 'object' && !Array.isArray(p)) {
+    out.autoTimer = !!p.autoTimer;
+    const r = Math.floor(Number(p.restSecs));
+    if (r >= 1 && r <= 5999) out.restSecs = r;
+  }
+  return out;
+}
 
 // ── THEME ─────────────────────────────────────────────────
 function setTheme(name) {
@@ -915,6 +1056,24 @@ function applyTheme() {
   document.getElementById('theme-purple').classList.toggle('selected', currentTheme === 'purple');
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', currentTheme === 'purple' ? '#08000f' : '#000000');
+}
+
+// ── PREFERÊNCIAS ──────────────────────────────────────────
+function setAutoTimer(on) {
+  prefs.autoTimer = !!on;
+  save(); applyPrefs();
+  toast(prefs.autoTimer ? 'Cronômetro automático ligado' : 'Cronômetro automático desligado');
+}
+function setRestSecs(val) {
+  const n = Math.floor(Number(val));
+  if (!(n >= 1 && n <= 5999)) { toast('Tempo inválido', true); applyPrefs(); return; }
+  prefs.restSecs = n;
+  save(); applyPrefs();
+}
+function applyPrefs() {
+  document.getElementById('auto-timer-toggle').checked = prefs.autoTimer;
+  document.getElementById('rest-secs-input').value = prefs.restSecs;
+  document.getElementById('rest-row').classList.toggle('off', !prefs.autoTimer);
 }
 
 // ── TABS ──────────────────────────────────────────────────
@@ -1075,22 +1234,29 @@ function incReps(wid, eid) {
 }
 // Carimba o histórico de carga ao marcar como feito.
 // ponytail: 1 entrada por dia (a última do dia vence), máx. 30.
-// XP só na 1ª conclusão do dia (des/re-marcar não farma XP, pois a
-// entrada do dia continua no hist). Desmarcar não remove XP.
+// XP só na 1ª conclusão do dia (des/re-marcar não farma XP). O marcador é
+// xpDay e não a presença de histórico, senão exercício de peso corporal
+// (sem kg e sem reps) nunca pontuava. Desmarcar não remove XP.
+// O fallback por hist mantém a dedupe correta em dados salvos antes do xpDay.
 function recordHistory(e) {
-  if (!e.weight && !e.reps) return;
   const today = new Date().toISOString().slice(0, 10);
-  const hadToday = (e.hist || []).some(h => h.d.slice(0, 10) === today);
-  e.hist = (e.hist || []).filter(h => h.d.slice(0, 10) !== today);
-  e.hist.push({ d: new Date().toISOString(), w: e.weight, r: e.reps });
-  if (e.hist.length > 30) e.hist = e.hist.slice(-30);
+  const hadToday = e.xpDay === today || (e.hist || []).some(h => h.d.slice(0, 10) === today);
+  const g = detectGroup(e.name);
+  const xpBefore = stats.xp[g] || 0;
   if (!hadToday) {
-    const g = detectGroup(e.name);
-    stats.xp[g] = (stats.xp[g] || 0) + XP_PER_EXERCISE;
+    e.xpDay = today;
+    stats.xp[g] = xpBefore + XP_PER_EXERCISE;
     const day = localDay();
     if (!stats.days.includes(day)) stats.days.push(day);
     if (stats.days.length > 730) stats.days = stats.days.slice(-730);
   }
+  // Histórico de carga só faz sentido com número registrado.
+  if (e.weight || e.reps) {
+    e.hist = (e.hist || []).filter(h => h.d.slice(0, 10) !== today);
+    e.hist.push({ d: new Date().toISOString(), w: e.weight, r: e.reps });
+    if (e.hist.length > 30) e.hist = e.hist.slice(-30);
+  }
+  return { gained: !hadToday, group: g, xpBefore: xpBefore };
 }
 function toggleExerciseDone(wid, eid) {
   const w = workouts.find(w => w.id === wid);
@@ -1098,11 +1264,23 @@ function toggleExerciseDone(wid, eid) {
   const e = w.exercises.find(e => e.id === eid);
   if (!e) return;
   e.done = !e.done;
-  if (e.done) recordHistory(e);
-  if (w.exercises.length && w.exercises.every(x => x.done)) {
-    w.lastCompleted = new Date().toISOString();
+  // Um toast por toque, do evento mais raro para o mais comum.
+  let msg = '';
+  if (e.done) {
+    const r = recordHistory(e);
+    const complete = w.exercises.length && w.exercises.every(x => x.done);
+    if (complete) w.lastCompleted = new Date().toISOString();
+    const up = r.gained ? rankUp(r.xpBefore, r.xpBefore + XP_PER_EXERCISE) : null;
+    if (complete) msg = 'Treino completo · ' + w.exercises.length + ' exercícios';
+    else if (up) msg = GROUP_LABELS[r.group] + ' subiu para ' + up.name;
+    else if (isPR(e)) msg = 'Novo recorde · ' + e.weight + ' kg';
+    else if (r.gained) msg = '+' + XP_PER_EXERCISE + ' XP · ' + GROUP_LABELS[r.group];
+    // Descanso automático: só faz sentido se ainda sobrou série para fazer.
+    // Roda dentro do clique, então ensureAudio() do startTimer vale no iOS.
+    if (prefs.autoTimer && !complete) startTimer(prefs.restSecs);
   }
   save(); refreshWorkouts();
+  if (msg) toast(msg);
 }
 
 // Re-renderiza a lista e, se aberto, o detalhe.
@@ -1124,12 +1302,14 @@ function renderWorkouts() {
     const total = w.exercises.length;
     const done = w.exercises.filter(e => e.done).length;
     const sub = total === 0 ? 'Sem exercícios' : (total === 1 ? '1 exercício' : total + ' exercícios');
+    // "há quanto tempo" na própria lista responde "que treino faço hoje?".
+    const when = w.lastCompleted ? ' · ' + relDays(w.lastCompleted) : '';
     return `
     <div class="card wk-card">
       <div class="wk-row" onclick="openWorkout('${w.id}')">
         <div class="wk-row-main">
           <div class="wk-row-name">${esc(w.name) || 'Sem nome'}</div>
-          <div class="wk-row-sub">${sub}</div>
+          <div class="wk-row-sub">${sub}${when}</div>
         </div>
         <div class="wk-row-right" onclick="event.stopPropagation()">
           ${total ? `<span class="wk-row-progress">${done}/${total}</span>${ringSvg(done, total)}` : ''}
@@ -1177,6 +1357,7 @@ function renderWorkoutDetail() {
               <span class="pill-unit">reps</span>
             </div>
             <button class="btn-plus1" onclick="incReps('${w.id}','${e.id}')" aria-label="Adicionar 1 repetição">${IC_PLUS}1</button>
+            ${isPR(e) ? `<span class="pr-badge" title="Maior carga já registrada">PR</span>` : ''}
           </div>
         </div>
       `).join('') : `<p style="color:var(--muted);font-size:14px;padding:12px 0;">Nenhum exercício ainda.</p>`}
@@ -1311,6 +1492,7 @@ function renderStats() {
   monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
   const weekStart = localDay(monday);
   const weekCount = stats.days.filter(d => d >= weekStart).length;
+  const streak = streakDays();
   // Ranks (só grupos com XP, maior primeiro)
   const groups = Object.keys(stats.xp).sort((a, b) => stats.xp[b] - stats.xp[a]);
   const rankCards = groups.map(g => {
@@ -1359,8 +1541,9 @@ function renderStats() {
   }).join('');
   el.innerHTML = `
     <div class="stats-grid">
-      <div class="stat-tile"><div class="stat-value">${stats.days.length}</div><div class="stat-label">dias treinados</div></div>
+      <div class="stat-tile${streak >= 2 ? ' hot' : ''}"><div class="stat-value">${streak}</div><div class="stat-label">sequência</div></div>
       <div class="stat-tile"><div class="stat-value">${weekCount}</div><div class="stat-label">esta semana</div></div>
+      <div class="stat-tile"><div class="stat-value">${stats.days.length}</div><div class="stat-label">dias totais</div></div>
     </div>
     <div class="settings-label">Ranks por grupo muscular</div>
     ${rankCards || `<div class="empty-state" style="padding:24px 20px">Complete exercícios para ganhar XP<br>e subir de rank. <b>+${XP_PER_EXERCISE} XP</b> por exercício/dia.</div>`}
@@ -1698,7 +1881,7 @@ function applyDietImport(replace) {
 
 // ── DADOS (EXPORT / IMPORT / RESET) ───────────────────────
 function exportData() {
-  const data = { version: 4, exportedAt: new Date().toISOString(), theme: currentTheme, workouts, meals, stats };
+  const data = { version: 4, exportedAt: new Date().toISOString(), theme: currentTheme, prefs, workouts, meals, stats };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1728,8 +1911,9 @@ function importData(input) {
       workouts = normW;
       meals = normM;
       stats = normalizeStats(data.stats);
+      prefs = normalizePrefs(data.prefs);
       if (data.theme === 'purple' || data.theme === 'black') setTheme(data.theme);
-      save(); refreshWorkouts(); refreshMeals();
+      save(); applyPrefs(); refreshWorkouts(); refreshMeals();
       toast('Dados importados');
     } catch (err) {
       toast('Arquivo de backup inválido', true);
@@ -1746,8 +1930,10 @@ function clearAllData() {
   localStorage.removeItem('gym_meals');
   localStorage.removeItem('gym_theme');
   localStorage.removeItem('gym_stats');
+  localStorage.removeItem('gym_prefs');
   workouts = []; meals = []; stats = { xp: {}, days: [] }; currentTheme = 'black';
-  applyTheme(); refreshWorkouts(); refreshMeals();
+  prefs = normalizePrefs(null);
+  applyTheme(); applyPrefs(); refreshWorkouts(); refreshMeals();
   toast('Todos os dados foram apagados');
 }
 
@@ -1774,8 +1960,112 @@ function fmtDate(iso) {
   return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear();
 }
 
+// ── GESTOS / SCROLL ───────────────────────────────────────
+// Swipe-down fecha a tela cheia. Só engata com o scroll no topo; se o dedo
+// subir, o gesto é devolvido para a rolagem em vez de arrastar a tela.
+const SWIPE_CLOSE_PX = 90;
+function attachSwipeClose(screenId, scrollId, close) {
+  const screen = document.getElementById(screenId);
+  const scroll = document.getElementById(scrollId);
+  let y0 = 0, dy = 0, active = false;
+  const reset = () => {
+    active = false; dy = 0;
+    screen.style.transition = '';
+    screen.style.transform = '';
+  };
+  screen.addEventListener('touchstart', ev => {
+    if (ev.touches.length !== 1 || scroll.scrollTop > 0) { active = false; return; }
+    active = true; y0 = ev.touches[0].clientY; dy = 0;
+    screen.style.transition = 'none';
+  }, { passive: true });
+  screen.addEventListener('touchmove', ev => {
+    if (!active) return;
+    dy = ev.touches[0].clientY - y0;
+    if (dy <= 0) { reset(); return; }
+    ev.preventDefault();
+    screen.style.transform = 'translateY(' + dy + 'px)';
+  }, { passive: false });
+  screen.addEventListener('touchend', () => {
+    if (!active) return;
+    const far = dy > SWIPE_CLOSE_PX;
+    reset();
+    if (far) close();
+  }, { passive: true });
+  screen.addEventListener('touchcancel', reset, { passive: true });
+}
+
+// Header encolhe depois de um pouco de rolagem. Histerese (40/20) evita
+// tremer no limite. O piso de 120px de espaço rolável evita laço: encolher
+// devolve ~48px de altura e, em lista curta, o clamp do scroll voltaria ao topo.
+function attachHeaderCollapse() {
+  document.querySelectorAll('.page').forEach(page => {
+    const scroll = page.querySelector('.page-scroll');
+    if (!scroll) return;
+    scroll.addEventListener('scroll', () => {
+      const on = page.classList.contains('compact');
+      const room = scroll.scrollHeight - scroll.clientHeight > 120;
+      if (!on && room && scroll.scrollTop > 40) page.classList.add('compact');
+      else if (on && scroll.scrollTop < 20) page.classList.remove('compact');
+    }, { passive: true });
+  });
+}
+
+// ── SELF-CHECK ────────────────────────────────────────────
+// ponytail: check mínimo das funções puras, sem framework nem arquivo extra.
+// Roda abrindo o app com ?selfcheck na URL; lança no console se algo quebrar.
+function selfCheck() {
+  const ok = (c, m) => { if (!c) throw new Error('selfCheck: ' + m); };
+  ok(detectGroup('Flexão de Punho') === 'antebraco', 'punho é antebraço, não peito');
+  ok(detectGroup('Rosca Supinada Ante') === 'antebraco', 'ante é antebraço, não bíceps');
+  ok(detectGroup('Flexão de Braço') === 'peito', 'flexão sem punho segue peito');
+  ok(detectGroup('Smith Barra') === 'pernas', 'smith é pernas');
+  ok(detectGroup('Tríceps Corda') === 'triceps', 'tríceps vence bíceps na ordem');
+  ok(detectGroup('Rosca Direta Polia') === 'biceps', 'rosca é bíceps');
+
+  ok((rankUp(90, 105) || {}).name === 'Bronze', 'cruzar 100 XP sobe para Bronze');
+  ok(rankUp(105, 120) === null, 'sem rank up dentro da mesma faixa');
+
+  ok(normalizePrefs(null).restSecs === REST_DEFAULT, 'prefs vazio cai no padrão');
+  ok(normalizePrefs(null).autoTimer === false, 'automático nasce desligado');
+  ok(normalizePrefs({ autoTimer: 1, restSecs: '120' }).autoTimer === true, 'autoTimer coage para boolean');
+  ok(normalizePrefs({ restSecs: '120' }).restSecs === 120, 'restSecs em string vira número');
+  ok(normalizePrefs({ restSecs: 0 }).restSecs === REST_DEFAULT, 'restSecs abaixo da faixa cai no padrão');
+  ok(normalizePrefs({ restSecs: 9999 }).restSecs === REST_DEFAULT, 'restSecs acima da faixa cai no padrão');
+
+  ok(isPR({ hist: [{ d: '2026-08-01', w: '50' }, { d: '2026-08-02', w: '55' }] }), 'carga maior é PR');
+  ok(!isPR({ hist: [{ d: '2026-08-01', w: '55' }, { d: '2026-08-02', w: '50' }] }), 'carga menor não é PR');
+  ok(!isPR({ hist: [{ d: '2026-08-02', w: '55' }] }), 'primeiro registro não é PR');
+
+  const keep = stats.days;
+  const ago = n => localDay(new Date(Date.now() - n * 86400000));
+  stats.days = [ago(1), ago(0)];
+  ok(streakDays() === 2, 'ontem + hoje = sequência 2');
+  stats.days = [ago(1)];
+  ok(streakDays() === 1, 'só ontem ainda conta (hoje em aberto)');
+  stats.days = [ago(3)];
+  ok(streakDays() === 0, 'buraco de um dia quebra a sequência');
+  stats.days = keep;
+
+  // XP de exercício sem carga nem reps (peso corporal) — o bug do v4.4.
+  const xpKeep = stats.xp.abdomen || 0;
+  const e = { name: 'Prancha', weight: '', reps: '', hist: [] };
+  ok(recordHistory(e).gained, 'peso corporal pontua');
+  ok((stats.xp.abdomen || 0) === xpKeep + XP_PER_EXERCISE, 'XP somou sem carga');
+  ok(!recordHistory(e).gained, 'não repontua no mesmo dia');
+  ok((stats.xp.abdomen || 0) === xpKeep + XP_PER_EXERCISE, 'XP não dobrou');
+  ok(e.hist.length === 0, 'sem carga não cria histórico');
+  if (xpKeep) stats.xp.abdomen = xpKeep; else delete stats.xp.abdomen;
+  stats.days = keep;
+
+  toast('selfCheck OK');
+}
+
 // ── INIT ──────────────────────────────────────────────────
-load(); applyTheme(); renderWorkouts(); renderMeals(); renderTimer();
+load(); applyTheme(); applyPrefs(); renderWorkouts(); renderMeals(); renderTimer();
+attachSwipeClose('workout-detail', 'detail-scroll', closeWorkout);
+attachSwipeClose('meal-detail', 'meal-detail-scroll', closeMeal);
+attachHeaderCollapse();
+if (location.search.includes('selfcheck')) selfCheck();
 document.getElementById('about-version').textContent = APP_VERSION;
 
 // ── SERVICE WORKER ────────────────────────────────────────
